@@ -2,23 +2,7 @@
 
 A component that lets you observe value of an Animated.Value or Reanimated Shared.Value and convert between them
 
-## Installation
-
-```sh
-npm install react-native-animated-observer
-```
-
-## Usage
-
-
-```js
-import { AnimatedObserverView } from "react-native-animated-observer";
-
-// ...
-
-<AnimatedObserverView color="tomato" />
-```
-
+**WIP: This library is still in development and not ready for production use.**
 
 ## Contributing
 
