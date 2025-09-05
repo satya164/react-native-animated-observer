@@ -1,7 +1,17 @@
-import { codegenNativeComponent, type ViewProps } from 'react-native';
+import {
+  codegenNativeComponent,
+  type CodegenTypes,
+  type ViewProps,
+} from 'react-native';
 
-interface NativeProps extends ViewProps {
-  color?: string;
+type ValueChangeEvent = {
+  value: CodegenTypes.Double;
+};
+
+export interface NativeProps extends ViewProps {
+  tag: string;
+  value?: CodegenTypes.Double;
+  onValueChange?: CodegenTypes.DirectEventHandler<ValueChangeEvent>;
 }
 
 export default codegenNativeComponent<NativeProps>('AnimatedObserverView');

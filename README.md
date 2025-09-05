@@ -4,29 +4,23 @@ A component that lets you observe value of an Animated.Value or Reanimated Share
 
 ## Installation
 
-
 ```sh
 npm install react-native-animated-observer
 ```
 
-
 ## Usage
 
-
 ```js
-import { AnimatedObserverView } from "react-native-animated-observer";
+import { AnimatedObserverView } from 'react-native-animated-observer';
 
 // ...
 
-<AnimatedObserverView color="tomato" />
+<AnimatedObserver from={animatedValue} to={reanimatedSharedValue} />;
 ```
-
 
 ## Contributing
 
-- [Development workflow](CONTRIBUTING.md#development-workflow)
-- [Sending a pull request](CONTRIBUTING.md#sending-a-pull-request)
-- [Code of conduct](CODE_OF_CONDUCT.md)
+See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
 
 ## License
 
