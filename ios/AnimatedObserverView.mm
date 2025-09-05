@@ -6,6 +6,9 @@
 #import <react/renderer/components/AnimatedObserverViewSpec/RCTComponentViewHelpers.h>
 
 #import "RCTFabricComponentsPlugins.h"
+#import "RCTConversions.h"
+
+#import "AnimatedObserver-Swift.h"
 
 using namespace facebook::react;
 
@@ -14,12 +17,13 @@ using namespace facebook::react;
 @end
 
 @implementation AnimatedObserverView {
-    UIView * _view;
+  UIView * _view;
+  AnimatedObserverEventManager * _manager;
 }
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
 {
-    return concreteComponentDescriptorProvider<AnimatedObserverViewComponentDescriptor>();
+  return concreteComponentDescriptorProvider<AnimatedObserverViewComponentDescriptor>();
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -27,45 +31,54 @@ using namespace facebook::react;
   if (self = [super initWithFrame:frame]) {
     static const auto defaultProps = std::make_shared<const AnimatedObserverViewProps>();
     _props = defaultProps;
-
+    
     _view = [[UIView alloc] init];
-
+    _manager = [[AnimatedObserverEventManager alloc] initWithEmit:^(double value) {
+      auto eventEmitter = std::static_pointer_cast<const AnimatedObserverViewEventEmitter>(self->_eventEmitter);
+      
+      if (eventEmitter) {
+        eventEmitter->onValueChange(AnimatedObserverViewEventEmitter::OnValueChange{
+          .value = value
+        });
+      }
+      
+      // This is temporary workaround to allow animations based on onPageScroll event
+      // until Fabric implements proper NativeAnimationDriver,
+      // see: https://github.com/facebook/react-native/blob/44f431b471c243c92284aa042d3807ba4d04af65/packages/react-native/React/Fabric/Mounting/ComponentViews/ScrollView/RCTScrollViewComponentView.mm#L59
+      ValueChangeEvent *event = [[ValueChangeEvent alloc] initWithReactTag:@(self.tag)
+                                                                     value:value];
+      NSDictionary *userInfo = @{@"event": event};
+      [[NSNotificationCenter defaultCenter] postNotificationName:@"RCTNotifyEventDispatcherObserversOfEvent_DEPRECATED"
+                                                          object:nil
+                                                        userInfo:userInfo];
+    }];
+    
     self.contentView = _view;
   }
-
+  
   return self;
 }
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
-    const auto &oldViewProps = *std::static_pointer_cast<AnimatedObserverViewProps const>(_props);
-    const auto &newViewProps = *std::static_pointer_cast<AnimatedObserverViewProps const>(props);
-
-    if (oldViewProps.color != newViewProps.color) {
-        NSString * colorToConvert = [[NSString alloc] initWithUTF8String: newViewProps.color.c_str()];
-        [_view setBackgroundColor:[self hexStringToColor:colorToConvert]];
-    }
-
-    [super updateProps:props oldProps:oldProps];
+  const auto &oldViewProps = *std::static_pointer_cast<AnimatedObserverViewProps const>(_props);
+  const auto &newViewProps = *std::static_pointer_cast<AnimatedObserverViewProps const>(props);
+  
+  if (oldViewProps.tag != newViewProps.tag) {
+    [_manager setTag:RCTNSStringFromString(newViewProps.tag)];
+  }
+  
+  if (oldViewProps.value != newViewProps.value) {
+    [_manager setValue:newViewProps.value];
+  }
+  
+  [super updateProps:props oldProps:oldProps];
 }
 
-Class<RCTComponentViewProtocol> AnimatedObserverViewCls(void)
+- (void)prepareForRecycle
 {
-    return AnimatedObserverView.class;
-}
-
-- hexStringToColor:(NSString *)stringToConvert
-{
-    NSString *noHashString = [stringToConvert stringByReplacingOccurrencesOfString:@"#" withString:@""];
-    NSScanner *stringScanner = [NSScanner scannerWithString:noHashString];
-
-    unsigned hex;
-    if (![stringScanner scanHexInt:&hex]) return nil;
-    int r = (hex >> 16) & 0xFF;
-    int g = (hex >> 8) & 0xFF;
-    int b = (hex) & 0xFF;
-
-    return [UIColor colorWithRed:r / 255.0f green:g / 255.0f blue:b / 255.0f alpha:1.0f];
+  [super prepareForRecycle];
+  [_manager dispose];
 }
 
 @end
