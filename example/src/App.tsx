@@ -8,6 +8,7 @@ import {
   ReanimatedToAnimated,
   ReanimatedValueObserver,
 } from './Examples';
+import backIcon from './assets/back-icon.png';
 
 const screens = {
   'Animated to Reanimated': AnimatedToReanimated,
@@ -34,10 +35,7 @@ export default function App() {
                 style={styles.button}
                 onPress={() => setCurrentScreen(null)}
               >
-                <Image
-                  source={require('./assets/back-icon.png')}
-                  style={styles.icon}
-                />
+                <Image source={backIcon} style={styles.icon} />
               </Pressable>
               <Text style={styles.title}>{currentScreen}</Text>
             </View>
