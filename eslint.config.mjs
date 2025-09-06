@@ -1,29 +1,24 @@
-import { fixupConfigRules } from '@eslint/compat';
-import { FlatCompat } from '@eslint/eslintrc';
-import js from '@eslint/js';
-import prettier from 'eslint-plugin-prettier';
-import { defineConfig } from 'eslint/config';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
-});
+import { defineConfig, globalIgnores } from 'eslint/config';
+import { react, recommended } from 'eslint-config-satya164';
+import sort from 'eslint-plugin-simple-import-sort';
 
 export default defineConfig([
+  recommended,
+  react,
+
+  globalIgnores([
+    '**/node_modules/',
+    '**/coverage/',
+    '**/dist/',
+    '**/lib/',
+    '**/.expo/',
+    '**/.yarn/',
+    '**/.vscode/',
+  ]),
+
   {
-    extends: fixupConfigRules(compat.extends('@react-native', 'prettier')),
-    plugins: { prettier },
-    rules: {
-      'react/react-in-jsx-scope': 'off',
-      'prettier/prettier': 'error',
+    plugins: {
+      'simple-import-sort': sort,
     },
-  },
-  {
-    ignores: ['node_modules/', 'lib/'],
   },
 ]);

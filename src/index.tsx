@@ -30,7 +30,7 @@ export function AnimatedObserver({
       {typeof value === 'number' ? (
         <ObserverView tag={tag} value={value} />
       ) : isSharedValue<number>(value) ? (
-        // @ts-expect-error
+        // @ts-expect-error - component has incorrect type for value prop
         <ReanimatedObserverViewInternal tag={tag} value={value} />
       ) : (
         <AnimatedObserverViewInternal tag={tag} value={value} />
@@ -38,7 +38,7 @@ export function AnimatedObserver({
       {typeof onValueChange === 'function' ? (
         <ObserverView tag={tag} onValueChange={onValueChange} />
       ) : onValueChange.constructor.name === 'AnimatedEvent' ? (
-        // @ts-expect-error
+        // @ts-expect-error - component has incorrect type for onValueChange prop
         <AnimatedObserverViewInternal tag={tag} onValueChange={onValueChange} />
       ) : (
         <ReanimatedObserverViewInternal
@@ -99,7 +99,7 @@ function AnimatedToReanimated({
   );
 
   // FIXME: What's the correct type?
-  // @ts-expect-error
+  // @ts-expect-error - component has incorrect type for onValueChange prop
   return <AnimatedObserver value={animatedValue} onValueChange={handler} />;
 }
 
