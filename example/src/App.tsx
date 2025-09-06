@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import {
   AnimatedToReanimated,
@@ -26,44 +25,42 @@ export default function App() {
   const ScreenComponent = currentScreen ? screens[currentScreen] : null;
 
   return (
-    <GestureHandlerRootView style={styles.container}>
-      <SafeAreaProvider style={styles.container}>
-        <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-          {ScreenComponent ? (
-            <>
-              <View style={styles.header}>
-                <Pressable
-                  style={styles.button}
-                  onPress={() => setCurrentScreen(null)}
-                >
-                  <Image
-                    source={require('./assets/back-icon.png')}
-                    style={styles.icon}
-                  />
-                </Pressable>
-                <Text style={styles.title}>{currentScreen}</Text>
-              </View>
+    <SafeAreaProvider style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+        {ScreenComponent ? (
+          <>
+            <View style={styles.header}>
+              <Pressable
+                style={styles.button}
+                onPress={() => setCurrentScreen(null)}
+              >
+                <Image
+                  source={require('./assets/back-icon.png')}
+                  style={styles.icon}
+                />
+              </Pressable>
+              <Text style={styles.title}>{currentScreen}</Text>
+            </View>
+            <View style={styles.separator} />
+            <View style={styles.screen}>
+              <ScreenComponent />
+            </View>
+          </>
+        ) : (
+          Object.keys(screens).map((name) => (
+            <React.Fragment key={name}>
+              <Pressable
+                style={styles.pressable}
+                onPress={() => setCurrentScreen(name as keyof typeof screens)}
+              >
+                <Text style={styles.label}>{name}</Text>
+              </Pressable>
               <View style={styles.separator} />
-              <View style={styles.screen}>
-                <ScreenComponent />
-              </View>
-            </>
-          ) : (
-            Object.keys(screens).map((name) => (
-              <React.Fragment key={name}>
-                <Pressable
-                  style={styles.pressable}
-                  onPress={() => setCurrentScreen(name as keyof typeof screens)}
-                >
-                  <Text style={styles.label}>{name}</Text>
-                </Pressable>
-                <View style={styles.separator} />
-              </React.Fragment>
-            ))
-          )}
-        </SafeAreaView>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+            </React.Fragment>
+          ))
+        )}
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 

@@ -10,11 +10,11 @@ import {
   AnimatedConverter,
   AnimatedObserver,
 } from 'react-native-animated-observer';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Reanimated, {
+  useAnimatedRef,
   useAnimatedStyle,
+  useScrollOffset,
   useSharedValue,
-  withSpring,
   type SharedValue,
 } from 'react-native-reanimated';
 
@@ -46,27 +46,28 @@ export function AnimatedToReanimated() {
 }
 
 export function ReanimatedToAnimated() {
-  const positionAnimated = useState(() => new Animated.Value(0))[0];
-  const positionReanimated = useSharedValue(0);
+  const { width } = useWindowDimensions();
+  const scrollRef = useAnimatedRef();
 
-  const pan = Gesture.Pan()
-    .onChange((e) => {
-      positionReanimated.set(Math.abs(e.translationX));
-    })
-    .onFinalize(() => {
-      positionReanimated.set(withSpring(0));
-    });
+  const positionAnimated = useState(() => new Animated.Value(0))[0];
+  const positionReanimated = useScrollOffset(scrollRef);
 
   return (
-    <GestureDetector gesture={pan}>
-      <View style={styles.container}>
-        <AnimatedConverter from={positionReanimated} to={positionAnimated} />
-        <Boxes
-          animatedValue={positionAnimated}
-          sharedValue={positionReanimated}
-        />
-      </View>
-    </GestureDetector>
+    <View style={styles.container}>
+      <AnimatedConverter from={positionReanimated} to={positionAnimated} />
+      <Boxes
+        animatedValue={positionAnimated}
+        sharedValue={positionReanimated}
+      />
+      <Animated.ScrollView
+        horizontal
+        contentContainerStyle={[styles.content, { width: width * 2 - 130 }]}
+        // @ts-expect-error the types are wrong
+        ref={scrollRef}
+      >
+        <View />
+      </Animated.ScrollView>
+    </View>
   );
 }
 
