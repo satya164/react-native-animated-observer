@@ -1,5 +1,9 @@
 import Foundation
 
+actor Observers {
+  static var items: [String: [AnimatedObserverEventManager]] = [:]
+}
+
 @objc
 public class AnimatedObserverEventManager : NSObject {
   private let emit: (Double) -> Void
@@ -9,18 +13,16 @@ public class AnimatedObserverEventManager : NSObject {
     self.emit = emit
   }
   
-  private static var observers: [String: [AnimatedObserverEventManager]] = [:]
-  
   private func add(tag: String) -> () -> Void {
-    Self.observers[tag, default: []].append(self)
+    Observers.items[tag, default: []].append(self)
     
     return {
-      Self.observers[tag]?.removeAll {
+      Observers.items[tag]?.removeAll {
         $0 === self
       }
       
-      if Self.observers[tag]?.isEmpty ?? true {
-        Self.observers[tag] = nil
+      if Observers.items[tag]?.isEmpty ?? true {
+        Observers.items[tag] = nil
       }
     }
   }
@@ -28,7 +30,7 @@ public class AnimatedObserverEventManager : NSObject {
   private func notify() {
     guard let tag else { return }
     
-    AnimatedObserverEventManager.observers[tag]?.forEach {
+    Observers.items[tag]?.forEach {
       $0.emit(self.value)
     }
   }

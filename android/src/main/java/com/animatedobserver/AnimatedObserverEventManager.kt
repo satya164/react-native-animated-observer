@@ -41,15 +41,14 @@ class AnimatedObserverEventManager(private val emitter: (value: Double) -> Unit)
   private var unregister: (() -> Unit)? = null
 
   private fun register(tag: String): () -> Unit {
-    val callbackList = observers.getOrPut(tag) { mutableListOf() }
-
-    synchronized(callbackList) {
+    synchronized(observers) {
+      val callbackList = observers.getOrPut(tag) { mutableListOf() }
       callbackList.add(emitter)
     }
 
     return {
-      observers[tag]?.let { callbacks ->
-        synchronized(callbacks) {
+      synchronized(observers) {
+        observers[tag]?.let { callbacks ->
           callbacks.remove(emitter)
 
           if (callbacks.isEmpty()) {
@@ -65,11 +64,15 @@ class AnimatedObserverEventManager(private val emitter: (value: Double) -> Unit)
 
     tag?.let { currentTag ->
       value?.let { currentValue ->
-        observers[currentTag]?.toList()?.forEach { callback ->
+        val observersList = synchronized(observers) {
+          observers[currentTag]?.toList()
+        }
+
+        observersList?.forEach { callback ->
           try {
             callback(currentValue)
           } catch (e: Exception) {
-            Log.e(TAG, "Error notifying observer: ${e.message}")
+            Log.e(TAG, "Error notifying observer for tag '$currentTag' with value $currentValue: ${e.message}", e)
           }
         }
       }
