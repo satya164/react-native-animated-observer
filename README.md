@@ -1,10 +1,13 @@
 # react-native-animated-observer
 
+[![npm][version-badge]][version]
+[![MIT License][license-badge]][license]
+
 Helpers that let you observe value of an [`Animated.Value`][animated.value] or [`SharedValue`][reanimated.sharedvalue] and convert between them using native events.
 
 ## Use case
 
-You use a component that uses [`Animated`](https://reactnative.dev/docs/animated), but you use [`Reanimated`](https://docs.swmansion.com/react-native-reanimated/docs/) for your animations, or vice versa. With this library, you can convert your value to work with the component.
+If you use a component that uses [`Animated`](https://reactnative.dev/docs/animated) and accepts animated values or styles, but you use [`Reanimated`](https://docs.swmansion.com/react-native-reanimated/docs/) for your app's animations, or vice versa. You can convert your values with this library to work with the component.
 
 ## Installation
 
@@ -48,7 +51,7 @@ A component that observes changes in a given value and emits an event when the v
 It accepts the following props:
 
 - `value`: The value to observe. It can be a `number`, [`Animated.Value`][animated.value], or [`SharedValue`][reanimated.sharedvalue].
-- `onValueChange`: A callback function that is called when the observed value changes. This function can integrate with [`Animated.event`](https://reactnative.dev/docs/animated#event) or [`useEvent`](https://docs.swmansion.com/react-native-reanimated/docs/advanced/useEvent).
+- `onValueChange`: A callback function that is called when the observed value changes.
 
 Usage:
 
@@ -67,6 +70,12 @@ const animatedValue = useRef(new Animated.Value(0)).current;
 />;
 ```
 
+## How it works
+
+The library uses the native event system to observe changes in the values of [`Animated.Value`][animated.value] and [`SharedValue`][reanimated.sharedvalue]. When a value changes, the library emits an event that can be listened to by the components.
+
+This event is then used with [`Animated.event`](https://reactnative.dev/docs/animated#event) (with native driver) or [`useEvent`](https://docs.swmansion.com/react-native-reanimated/docs/advanced/useEvent) to update [`Animated.Value`][animated.value] or [`SharedValue`][reanimated.sharedvalue] respectively depending on the usage.
+
 ## Contributing
 
 See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
@@ -81,3 +90,7 @@ Made with [create-react-native-library](https://github.com/callstack/react-nativ
 
 [animated.value]: https://reactnative.dev/docs/animated#value
 [reanimated.sharedvalue]: https://docs.swmansion.com/react-native-reanimated/docs/core/useSharedValue/
+[version-badge]: https://img.shields.io/npm/v/react-native-animated-observer.svg?style=flat-square
+[license-badge]: https://img.shields.io/npm/l/react-native-animated-observer.svg?style=flat-square
+[version]: https://www.npmjs.com/package/react-native-animated-observer
+[license]: https://opensource.org/licenses/MIT
