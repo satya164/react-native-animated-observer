@@ -2,6 +2,10 @@
 
 Helpers that let you observe value of an [`Animated.Value`][animated.value] or [`SharedValue`][reanimated.sharedvalue] and convert between them using native events.
 
+## Use case
+
+You use a component that uses [`Animated`](https://reactnative.dev/docs/animated), but you use [`Reanimated`](https://docs.swmansion.com/react-native-reanimated/docs/) for your animations, or vice versa. With this library, you can convert your value to work with the component.
+
 ## Installation
 
 ```sh
@@ -21,12 +25,16 @@ It accepts the following props:
 - `from`
 - `to`
 
-The `from` and `to` props need to be a pair of [`Animated.Value`][animated.value] and [`SharedValue`][reanimated.sharedvalue] respectively.
+The `from` and `to` props need to be a pair of [`Animated.Value`][animated.value] and [`SharedValue`][reanimated.sharedvalue] or vice versa. The value passed to `from` will be used to update the value of `to`.
 
 Usage:
 
 ```js
 import { AnimatedConverter } from 'react-native-animated-observer';
+
+// ...
+const animatedValue = useRef(new Animated.Value(0)).current;
+const reanimatedSharedValue = useSharedValue(0);
 
 // ...
 
@@ -46,6 +54,10 @@ Usage:
 
 ```js
 import { AnimatedObserver } from 'react-native-animated-observer';
+
+// ...
+
+const animatedValue = useRef(new Animated.Value(0)).current;
 
 // ...
 
