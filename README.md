@@ -1,6 +1,6 @@
 # react-native-animated-observer
 
-A component that lets you observe value of an Animated.Value or Reanimated Shared.Value and convert between them
+Helpers that let you observe value of an [`Animated.Value`][animated.value] or [`SharedValue`][reanimated.sharedvalue] and convert between them using native events.
 
 ## Installation
 
@@ -8,14 +8,51 @@ A component that lets you observe value of an Animated.Value or Reanimated Share
 npm install react-native-animated-observer
 ```
 
-## Usage
+## API
+
+The library exports the following components:
+
+### `AnimatedConverter`
+
+A component that converts between an [`Animated.Value`][animated.value] and a [`SharedValue`][reanimated.sharedvalue] natively.
+
+It accepts the following props:
+
+- `from`
+- `to`
+
+The `from` and `to` props need to be a pair of [`Animated.Value`][animated.value] and [`SharedValue`][reanimated.sharedvalue] respectively.
+
+Usage:
 
 ```js
-import { AnimatedObserverView } from 'react-native-animated-observer';
+import { AnimatedConverter } from 'react-native-animated-observer';
 
 // ...
 
-<AnimatedObserver from={animatedValue} to={reanimatedSharedValue} />;
+<AnimatedConverter from={animatedValue} to={reanimatedSharedValue} />;
+```
+
+### `AnimatedObserver`
+
+A component that observes changes in a given value and emits an event when the value changes. This is the building block for `AnimatedConverter`.
+
+It accepts the following props:
+
+- `value`: The value to observe. It can be a `number`, [`Animated.Value`][animated.value], or [`SharedValue`][reanimated.sharedvalue].
+- `onValueChange`: A callback function that is called when the observed value changes. This function can integrate with [`Animated.event`](https://reactnative.dev/docs/animated#event) or [`useEvent`](https://docs.swmansion.com/react-native-reanimated/docs/advanced/useEvent).
+
+Usage:
+
+```js
+import { AnimatedObserver } from 'react-native-animated-observer';
+
+// ...
+
+<AnimatedObserver
+  value={animatedValue}
+  onValueChange={(e) => console.log(e.nativeEvent.value)}
+/>;
 ```
 
 ## Contributing
@@ -29,3 +66,6 @@ MIT
 ---
 
 Made with [create-react-native-library](https://github.com/callstack/react-native-builder-bob)
+
+[animated.value]: https://reactnative.dev/docs/animated#value
+[reanimated.sharedvalue]: https://docs.swmansion.com/react-native-reanimated/docs/core/useSharedValue/
