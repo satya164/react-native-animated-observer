@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -28,27 +28,34 @@ export default function App() {
   return (
     <GestureHandlerRootView style={styles.container}>
       <SafeAreaProvider style={styles.container}>
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
           {ScreenComponent ? (
             <>
-              <Pressable
-                style={styles.button}
-                onPress={() => setCurrentScreen(null)}
-              >
-                <Text>Back</Text>
-              </Pressable>
-              <ScreenComponent />
+              <View style={styles.header}>
+                <Pressable
+                  style={styles.button}
+                  onPress={() => setCurrentScreen(null)}
+                >
+                  <Image
+                    source={require('./assets/back-icon.png')}
+                    style={styles.icon}
+                  />
+                </Pressable>
+                <Text style={styles.title}>{currentScreen}</Text>
+              </View>
+              <View style={styles.separator} />
+              <View style={styles.screen}>
+                <ScreenComponent />
+              </View>
             </>
           ) : (
             Object.keys(screens).map((name) => (
               <React.Fragment key={name}>
                 <Pressable
-                  style={styles.button}
+                  style={styles.pressable}
                   onPress={() => setCurrentScreen(name as keyof typeof screens)}
                 >
-                  <View>
-                    <Text>{name}</Text>
-                  </View>
+                  <Text style={styles.label}>{name}</Text>
                 </Pressable>
                 <View style={styles.separator} />
               </React.Fragment>
@@ -64,11 +71,37 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  button: {
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 64,
+  },
+  pressable: {
     padding: 16,
+  },
+  button: {
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  icon: {
+    width: 24,
+    height: 24,
+    margin: 14,
+    resizeMode: 'contain',
+  },
+  title: {
+    fontSize: 20,
+  },
+  label: {
+    fontSize: 18,
   },
   separator: {
     height: StyleSheet.hairlineWidth,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  },
+  screen: {
+    flex: 1,
+    backgroundColor: '#f0f0f0',
   },
 });
