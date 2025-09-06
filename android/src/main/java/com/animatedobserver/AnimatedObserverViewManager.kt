@@ -1,6 +1,7 @@
 package com.animatedobserver
 
 import android.util.Log
+import android.view.View
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.WritableMap
@@ -16,18 +17,44 @@ import com.facebook.react.viewmanagers.AnimatedObserverViewManagerInterface
 import java.util.concurrent.ConcurrentHashMap
 
 @ReactModule(name = AnimatedObserverViewManager.NAME)
-class AnimatedObserverViewManager : SimpleViewManager<AnimatedObserverView>(),
-  AnimatedObserverViewManagerInterface<AnimatedObserverView> {
-  private val mDelegate: ViewManagerDelegate<AnimatedObserverView> =
+class AnimatedObserverViewManager : SimpleViewManager<View>(),
+  AnimatedObserverViewManagerInterface<View> {
+  private val mDelegate: ViewManagerDelegate<View> =
     AnimatedObserverViewManagerDelegate(this)
 
-  override fun createViewInstance(context: ThemedReactContext): AnimatedObserverView {
-    return AnimatedObserverView(context)
+  private var manager: AnimatedObserverEventManager? = null;
+
+  override fun createViewInstance(context: ThemedReactContext): View {
+    val view = View(context)
+
+    manager?.cleanup()
+    manager = AnimatedObserverEventManager({ value ->
+      val reactContext = view.context as ReactContext
+      val surfaceId = UIManagerHelper.getSurfaceId(reactContext)
+      val eventDispatcher = UIManagerHelper.getEventDispatcherForReactTag(reactContext, surfaceId)
+        ?: throw IllegalStateException("$AnimatedObserverViewManager.NAME: EventDispatcher is not available for surfaceId: $surfaceId")
+
+      eventDispatcher.dispatchEvent(ValueChangeEvent(surfaceId, view.id, value))
+    })
+
+    return view;
   }
 
-  override fun onDropViewInstance(view: AnimatedObserverView) {
-    cleanup()
+  override fun onDropViewInstance(view: View) {
+    manager?.cleanup()
+    manager = null
+
     super.onDropViewInstance(view)
+  }
+
+  override fun prepareToRecycleView(
+    reactContext: ThemedReactContext,
+    view: View
+  ): View? {
+    manager?.cleanup()
+    manager = null
+
+    return super.prepareToRecycleView(reactContext, view)
   }
 
   override fun getDelegate() = mDelegate
@@ -38,82 +65,14 @@ class AnimatedObserverViewManager : SimpleViewManager<AnimatedObserverView>(),
     EVENT_ON_CHANGE to mapOf("registrationName" to EVENT_ON_CHANGE)
   )
 
-  private var value: Double? = null
-  private var tag: String? = null
-
-  private var unregister: (() -> Unit)? = null
-
-  private fun cleanup() {
-    unregister?.invoke()
-    unregister = null
-  }
-
   @ReactProp(name = "tag")
-  override fun setTag(view: AnimatedObserverView, nextTag: String?) {
-    Log.d(NAME, "setTag called with tag: $nextTag")
-
-    cleanup()
-
-    tag = nextTag
-    tag?.let { currentTag ->
-      val reactContext = view.context as ReactContext
-      val surfaceId = UIManagerHelper.getSurfaceId(reactContext)
-      val eventDispatcher = UIManagerHelper.getEventDispatcherForReactTag(reactContext, surfaceId)
-        ?: throw IllegalStateException("AnimatedObserverView: EventDispatcher is not available for surfaceId: $surfaceId")
-
-      unregister = register(currentTag) { value ->
-        eventDispatcher.dispatchEvent(ValueChangeEvent(surfaceId, view.id, value))
-      }
-    }
-
-    emit()
+  override fun setTag(view: View, nextTag: String?) {
+    manager?.tag = nextTag
   }
 
   @ReactProp(name = "value")
-  override fun setValue(view: AnimatedObserverView, nextValue: Double) {
-    Log.d(NAME, "setValue called with value: $nextValue for tag: $tag")
-
-    value = nextValue
-
-    emit()
-  }
-
-  fun register(tag: String, callback: (Double) -> Unit): () -> Unit {
-    val callbackList = observers.getOrPut(tag) { mutableListOf() }
-
-    synchronized(callbackList) {
-      callbackList.add(callback)
-    }
-
-    return {
-      observers[tag]?.let { callbacks ->
-        synchronized(callbacks) {
-          callbacks.remove(callback)
-
-          if (callbacks.isEmpty()) {
-            observers.remove(tag)
-          }
-        }
-      }
-    }
-  }
-
-  fun emit() {
-    Log.d(NAME, "Notifying observers for tag: $tag with value: $value")
-
-    tag?.let { currentTag ->
-      value?.let { currentValue ->
-        observers[tag]?.toList()?.forEach { callback ->
-          try {
-            Log.d(NAME, "Calling callback: $tag with value: $value")
-
-            callback(currentValue)
-          } catch (e: Exception) {
-            Log.e(NAME, "Error notifying observer: ${e.message}")
-          }
-        }
-      }
-    }
+  override fun setValue(view: View, nextValue: Double) {
+   manager?.value = nextValue
   }
 
   inner class ValueChangeEvent(
@@ -129,7 +88,5 @@ class AnimatedObserverViewManager : SimpleViewManager<AnimatedObserverView>(),
   companion object {
     const val NAME = "AnimatedObserverView"
     const val EVENT_ON_CHANGE = "topValueChange"
-
-    private val observers = ConcurrentHashMap<String, MutableList<(Double) -> Unit>>()
   }
 }
