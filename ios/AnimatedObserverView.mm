@@ -47,9 +47,9 @@ using namespace facebook::react;
         });
       }
 
-      // This is temporary workaround to allow animations based on onPageScroll event
-      // until Fabric implements proper NativeAnimationDriver,
-      // see: https://github.com/facebook/react-native/blob/44f431b471c243c92284aa042d3807ba4d04af65/packages/react-native/React/Fabric/Mounting/ComponentViews/ScrollView/RCTScrollViewComponentView.mm#L59
+      // FIXME:
+      // Workaround to make `onValueChange` work with `Animated.event` using `useNativeDriver: true`
+      // See: https://github.com/facebook/react-native/blob/44f431b471c243c92284aa042d3807ba4d04af65/packages/react-native/React/Fabric/Mounting/ComponentViews/ScrollView/RCTScrollViewComponentView.mm#L59
       ValueChangeEvent *event = [[ValueChangeEvent alloc] initWithReactTag:@(self.tag)
                                                                      value:value];
       NSDictionary *userInfo = @{@"event": event};

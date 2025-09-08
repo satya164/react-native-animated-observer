@@ -87,6 +87,11 @@ class AnimatedObserverViewManager : SimpleViewManager<View>(),
 
   companion object {
     const val NAME = "AnimatedObserverView"
+
+    /**
+     * On Android, it's necessary to use `top` prefix for event names
+     * Otherwise it doesn't work with `Animated.event` using `useNativeDriver: true`
+     */
     const val EVENT_ON_CHANGE = "topValueChange"
   }
 }
