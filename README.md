@@ -3,7 +3,7 @@
 [![npm][version-badge]][version]
 [![MIT License][license-badge]][license]
 
-Helpers that let you observe [Animated][animated] and [Reanimated][reanimated] values and convert between them using native events.
+Helpers that let you observe [Animated][animated] and [Reanimated][reanimated] values and convert between them.
 
 ## Use case
 
@@ -23,19 +23,7 @@ The library exports the following components:
 
 A component that converts between an [`Animated.Node`][animated.node] and a [`SharedValue<number>`][reanimated.sharedvalue] natively.
 
-It accepts the following props:
-
-- `from`: Value to read and observe changes from.
-
-  [`Animated.Node`][animated.node] - [`Animated.Value`][animated.value] or result of modifications such as interpolation (`Animated.AnimatedInterpolation`), addition (`Animated.AnimatedAddition`), etc.
-
-  [`SharedValue<number>`][reanimated.sharedvalue] or [`DerivedValue<number>`][reanimated.derivedvalue]
-
-- `to`: Value to update when the `from` value changes.
-
-  [`Animated.Value`][animated.value] or [`SharedValue<number>`][reanimated.sharedvalue]
-
-Usage:
+**Usage:**
 
 ```js
 import { AnimatedConverter } from 'react-native-animated-observer';
@@ -49,16 +37,27 @@ const reanimatedSharedValue = useSharedValue(0);
 <AnimatedConverter from={animatedValue} to={reanimatedSharedValue} />;
 ```
 
+It accepts the following props:
+
+#### `from`
+
+Value to read and observe changes from. It can be one of the following:
+
+- [`Animated.Node`][animated.node] - [`Animated.Value`][animated.value] or result of modifications such as interpolation (`Animated.AnimatedInterpolation`), addition (`Animated.AnimatedAddition`), etc.
+- [`SharedValue<number>`][reanimated.sharedvalue] or [`DerivedValue<number>`][reanimated.derivedvalue]
+
+#### `to`
+
+Value to update when the [`from`](#from) value changes. It can be one of the following:
+
+- [`Animated.Value`][animated.value]
+- [`SharedValue<number>`][reanimated.sharedvalue]
+
 ### `AnimatedObserver`
 
 A component that observes changes in a given value and emits an event when the value changes. This is the building block for `AnimatedConverter`.
 
-It accepts the following props:
-
-- `value`: The value to observe. It can be a `number`, [`Animated.Node`][animated.node] for [Animated][animated], [`SharedValue<number>`][reanimated.sharedvalue] or [`DerivedValue<number>`][reanimated.derivedvalue] for [Reanimated][reanimated].
-- `onValueChange`: A callback function that is called when the observed value changes.
-
-Usage:
+**Usage:**
 
 ```js
 import { AnimatedObserver } from 'react-native-animated-observer';
@@ -74,6 +73,18 @@ const animatedValue = useRef(new Animated.Value(0)).current;
   onValueChange={(e) => console.log(e.nativeEvent.value)}
 />;
 ```
+
+It accepts the following props:
+
+#### `value`
+
+The value to observe.
+
+It can be a `number`, [`Animated.Node`][animated.node] for [Animated][animated], [`SharedValue<number>`][reanimated.sharedvalue] or [`DerivedValue<number>`][reanimated.derivedvalue] for [Reanimated][reanimated].
+
+#### `onValueChange`
+
+A callback function that is called when the observed value changes.
 
 ## How it works
 
