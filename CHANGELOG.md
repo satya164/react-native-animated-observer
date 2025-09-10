@@ -1,5 +1,10 @@
 # Changelog
 
+## <small>0.2.3 (2025-09-10)</small>
+
+* docs: fix typo ([21bb759](https://github.com/satya164/react-native-animated-observer/commit/21bb759))
+* chore: remove incorrect prop ([c369e13](https://github.com/satya164/react-native-animated-observer/commit/c369e13))
+
 ## <small>0.2.2 (2025-09-10)</small>
 
 * chore: bump version to match npm ([9fd4a8a](https://github.com/satya164/react-native-animated-observer/commit/9fd4a8a))

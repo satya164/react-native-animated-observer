@@ -1,6 +1,6 @@
 {
   "name": "react-native-animated-observer",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "A component that lets you observe Animated and Reanimated values and convert between them",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
