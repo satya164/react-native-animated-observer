@@ -39,7 +39,6 @@ export function AnimatedToReanimated() {
     <View style={styles.container}>
       <AnimatedConverter from={positionAnimated} to={positionReanimated} />
       <AnimatedConverter
-        name="PositionAnimatedInterpolated"
         from={positionAnimatedInterpolated}
         to={positionReanimatedInterpolated}
       />
