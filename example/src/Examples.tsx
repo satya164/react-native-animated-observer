@@ -11,8 +11,10 @@ import {
   AnimatedObserver,
 } from 'react-native-animated-observer';
 import Reanimated, {
+  interpolate,
   useAnimatedRef,
   useAnimatedStyle,
+  useDerivedValue,
   useScrollOffset,
   useSharedValue,
   type SharedValue,
@@ -21,19 +23,33 @@ import Reanimated, {
 export function AnimatedToReanimated() {
   const { width } = useWindowDimensions();
 
+  const scrollWidth = useScrollWidth();
+
   const positionAnimated = useState(() => new Animated.Value(0))[0];
   const positionReanimated = useSharedValue(0);
+
+  const positionAnimatedInterpolated = positionAnimated.interpolate({
+    inputRange: [0, scrollWidth - width],
+    outputRange: [1, 0],
+  });
+
+  const positionReanimatedInterpolated = useSharedValue(scrollWidth);
 
   return (
     <View style={styles.container}>
       <AnimatedConverter from={positionAnimated} to={positionReanimated} />
+      <AnimatedConverter
+        from={positionAnimatedInterpolated}
+        to={positionReanimatedInterpolated}
+      />
+      <ProgressBarReanimated value={positionReanimatedInterpolated} />
       <Boxes
         animatedValue={positionAnimated}
         sharedValue={positionReanimated}
       />
       <Animated.ScrollView
         horizontal
-        contentContainerStyle={[styles.content, { width: width * 2 - 130 }]}
+        contentContainerStyle={[styles.content, { width: scrollWidth }]}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { x: positionAnimated } } }],
           { useNativeDriver: true }
@@ -47,21 +63,38 @@ export function AnimatedToReanimated() {
 
 export function ReanimatedToAnimated() {
   const { width } = useWindowDimensions();
+
+  const scrollWidth = useScrollWidth();
   const scrollRef = useAnimatedRef();
 
-  const positionAnimated = useState(() => new Animated.Value(0))[0];
   const positionReanimated = useScrollOffset(scrollRef);
+  const positionAnimated = useState(() => new Animated.Value(0))[0];
+
+  const positionReanimatedInterpolated = useDerivedValue(() => {
+    return interpolate(
+      positionReanimated.value,
+      [0, scrollWidth - width],
+      [1, 0]
+    );
+  });
+
+  const positionAnimatedInterpolated = useState(() => new Animated.Value(1))[0];
 
   return (
     <View style={styles.container}>
       <AnimatedConverter from={positionReanimated} to={positionAnimated} />
+      <AnimatedConverter
+        from={positionReanimatedInterpolated}
+        to={positionAnimatedInterpolated}
+      />
+      <ProgressBarAnimated value={positionAnimatedInterpolated} />
       <Boxes
         animatedValue={positionAnimated}
         sharedValue={positionReanimated}
       />
       <Animated.ScrollView
         horizontal
-        contentContainerStyle={[styles.content, { width: width * 2 - 130 }]}
+        contentContainerStyle={[styles.content, { width: scrollWidth }]}
         // @ts-expect-error the types are wrong
         ref={scrollRef}
       >
@@ -133,10 +166,43 @@ function Boxes({
   );
 }
 
+function ProgressBarAnimated({ value }: { value: Animated.Node }) {
+  const { width } = useWindowDimensions();
+
+  return (
+    <View style={styles.progressBar}>
+      <Animated.View
+        style={[
+          styles.progress,
+          {
+            transform: [{ translateX: Animated.multiply(value, -width) }],
+          },
+        ]}
+      />
+    </View>
+  );
+}
+
+function ProgressBarReanimated({ value }: { value: SharedValue<number> }) {
+  const { width } = useWindowDimensions();
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: value.get() * -width }],
+    };
+  });
+
+  return (
+    <View style={styles.progressBar}>
+      <Reanimated.View style={[styles.progress, animatedStyle]} />
+    </View>
+  );
+}
+
 function ObserverDisplay({
   value,
 }: {
-  value: number | Animated.Value | SharedValue<number>;
+  value: number | Animated.Node | Omit<SharedValue<number>, 'set'>;
 }) {
   const [displayValue, setDisplayValue] = useState(0);
 
@@ -151,6 +217,12 @@ function ObserverDisplay({
       <Text style={styles.value}>{displayValue}</Text>
     </View>
   );
+}
+
+function useScrollWidth() {
+  const { width } = useWindowDimensions();
+
+  return width * 2 - 130;
 }
 
 function useInterval(callback: () => void, delay: number = 1000) {
@@ -204,9 +276,17 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   reanimated: {
-    backgroundColor: '#f78c6c',
+    backgroundColor: '#FF1744',
   },
   animated: {
-    backgroundColor: '#82aaff',
+    backgroundColor: '#304FFE',
+  },
+  progressBar: {
+    height: 3,
+    overflow: 'hidden',
+  },
+  progress: {
+    height: '100%',
+    backgroundColor: '#212121',
   },
 });

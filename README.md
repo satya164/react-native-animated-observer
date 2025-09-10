@@ -25,10 +25,15 @@ A component that converts between an [`Animated.Value`][animated.value] and a [`
 
 It accepts the following props:
 
-- `from`
-- `to`
+- `from`: Value to read and observe changes from.
 
-The `from` and `to` props need to be a pair of [`Animated.Value`][animated.value] and [`SharedValue`][reanimated.sharedvalue] or vice versa. The value passed to `from` will be used to update the value passed to `to`.
+  `Animated.Node` - `Animated.Value` and result of modifications such as interpolation (`Animated.AnimatedInterpolation`), addition (`Animated.AnimatedAddition`), etc.
+
+  `SharedValue<number>` or `DerivedValue<number>`
+
+- `to`: Value to update when the `from` value changes.
+
+  `Animated.Value` or `SharedValue<number>`
 
 Usage:
 

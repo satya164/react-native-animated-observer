@@ -9,7 +9,7 @@ import Reanimated, {
 import { default as ObserverView } from './AnimatedObserverViewNativeComponent';
 
 type AnimatedObserverProps = {
-  value: Animated.Value | SharedValue<number> | number;
+  value: Animated.Node | Omit<SharedValue<number>, 'set'> | number;
   onValueChange: NonNullable<
     | React.ComponentProps<typeof ObserverView>['onValueChange']
     | React.ComponentProps<typeof AnimatedObserverViewInternal>['onValueChange']
@@ -33,6 +33,7 @@ export function AnimatedObserver({
         // @ts-expect-error - component has incorrect type for value prop
         <ReanimatedObserverViewInternal tag={tag} value={value} />
       ) : (
+        // @ts-expect-error - isSharedValue won't return proper type for derived value
         <AnimatedObserverViewInternal tag={tag} value={value} />
       )}
       {typeof onValueChange === 'function' ? (
@@ -60,6 +61,7 @@ export function AnimatedConverter(props: AnimatedConverterProps) {
   }
 
   if (!isSharedValue<number>(props.from) && isSharedValue<number>(props.to)) {
+    // @ts-expect-error - isSharedValue won't return proper type for derived value
     return <AnimatedToReanimated from={props.from} to={props.to} />;
   }
 
@@ -69,7 +71,7 @@ export function AnimatedConverter(props: AnimatedConverterProps) {
 }
 
 type AnimatedToReanimatedProps = {
-  from: Animated.Value;
+  from: Animated.Node;
   to: SharedValue<number>;
 };
 
@@ -104,7 +106,7 @@ function AnimatedToReanimated({
 }
 
 type ReanimatedToAnimatedProps = {
-  from: SharedValue<number>;
+  from: Omit<SharedValue<number>, 'set'>;
   to: Animated.Value;
 };
 
