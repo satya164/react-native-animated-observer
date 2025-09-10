@@ -1,97 +1,53 @@
 package com.animatedobserver
 
-import android.util.Log
-import android.view.View
-import com.facebook.react.bridge.Arguments
-import com.facebook.react.bridge.ReactContext
-import com.facebook.react.bridge.WritableMap
 import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.uimanager.ThemedReactContext
-import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.ViewManagerDelegate
 import com.facebook.react.uimanager.annotations.ReactProp
-import com.facebook.react.uimanager.events.Event
 import com.facebook.react.viewmanagers.AnimatedObserverViewManagerDelegate
 import com.facebook.react.viewmanagers.AnimatedObserverViewManagerInterface
-import java.util.concurrent.ConcurrentHashMap
 
-@ReactModule(name = AnimatedObserverViewManager.NAME)
-class AnimatedObserverViewManager : SimpleViewManager<View>(),
-  AnimatedObserverViewManagerInterface<View> {
-  private val mDelegate: ViewManagerDelegate<View> =
+@ReactModule(name = AnimatedObserverView.NAME)
+class AnimatedObserverViewManager : SimpleViewManager<AnimatedObserverView>(),
+  AnimatedObserverViewManagerInterface<AnimatedObserverView> {
+  private val mDelegate: ViewManagerDelegate<AnimatedObserverView> =
     AnimatedObserverViewManagerDelegate(this)
 
-  private var manager: AnimatedObserverEventManager? = null;
-
-  override fun createViewInstance(context: ThemedReactContext): View {
-    val view = View(context)
-
-    manager?.cleanup()
-    manager = AnimatedObserverEventManager({ value ->
-      val reactContext = view.context as ReactContext
-      val surfaceId = UIManagerHelper.getSurfaceId(reactContext)
-      val eventDispatcher = UIManagerHelper.getEventDispatcherForReactTag(reactContext, surfaceId)
-        ?: throw IllegalStateException("$AnimatedObserverViewManager.NAME: EventDispatcher is not available for surfaceId: $surfaceId")
-
-      eventDispatcher.dispatchEvent(ValueChangeEvent(surfaceId, view.id, value))
-    })
+  override fun createViewInstance(context: ThemedReactContext): AnimatedObserverView {
+    val view = AnimatedObserverView(context)
 
     return view;
   }
 
-  override fun onDropViewInstance(view: View) {
-    manager?.cleanup()
-    manager = null
+  override fun onDropViewInstance(view: AnimatedObserverView) {
+    view.manager.cleanup()
 
     super.onDropViewInstance(view)
   }
 
   override fun prepareToRecycleView(
     reactContext: ThemedReactContext,
-    view: View
-  ): View? {
-    manager?.cleanup()
-    manager = null
-
+    view: AnimatedObserverView
+  ): AnimatedObserverView? {
     return super.prepareToRecycleView(reactContext, view)
   }
 
   override fun getDelegate() = mDelegate
 
-  override fun getName() = NAME
+  override fun getName() = AnimatedObserverView.NAME
 
   override fun getExportedCustomDirectEventTypeConstants() = mapOf(
-    EVENT_ON_CHANGE to mapOf("registrationName" to EVENT_ON_CHANGE)
+    AnimatedObserverView.EVENT_ON_CHANGE to mapOf("registrationName" to AnimatedObserverView.EVENT_ON_CHANGE)
   )
 
   @ReactProp(name = "tag")
-  override fun setTag(view: View, nextTag: String?) {
-    manager?.tag = nextTag
+  override fun setTag(view: AnimatedObserverView, nextTag: String?) {
+    view.manager.tag = nextTag
   }
 
   @ReactProp(name = "value")
-  override fun setValue(view: View, nextValue: Double) {
-   manager?.value = nextValue
-  }
-
-  inner class ValueChangeEvent(
-    surfaceId: Int, viewId: Int, private val value: Double
-  ) : Event<ValueChangeEvent>(surfaceId, viewId) {
-    override fun getEventName() = EVENT_ON_CHANGE
-
-    override fun getEventData(): WritableMap = Arguments.createMap().apply {
-      putDouble("value", value)
-    }
-  }
-
-  companion object {
-    const val NAME = "AnimatedObserverView"
-
-    /**
-     * On Android, it's necessary to use `top` prefix for event names
-     * Otherwise it doesn't work with `Animated.event` using `useNativeDriver: true`
-     */
-    const val EVENT_ON_CHANGE = "topValueChange"
+  override fun setValue(view: AnimatedObserverView, nextValue: Double) {
+    view.manager.value = nextValue
   }
 }

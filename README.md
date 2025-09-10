@@ -3,11 +3,11 @@
 [![npm][version-badge]][version]
 [![MIT License][license-badge]][license]
 
-Helpers that let you observe the value of an [`Animated.Value`][animated.value] or [`SharedValue`][reanimated.sharedvalue] and convert between them using native events.
+Helpers that let you observe the value of an [Animated][animated] or [Reanimated][reanimated] values and convert between them using native events.
 
 ## Use case
 
-This library is useful when you have a component that uses [`Animated`](https://reactnative.dev/docs/animated) and accepts animated values or styles, but you use [`Reanimated`](https://docs.swmansion.com/react-native-reanimated/docs/) for your app's animations, or vice versa. You can use this library to convert your values to work with the component.
+This library is useful when you have a component that uses [Animated][animated] and accepts animated values or styles, but you use [Reanimated][reanimated] for your app's animations, or vice versa. You can use this library to convert your values to work with the component.
 
 ## Installation
 
@@ -21,19 +21,19 @@ The library exports the following components:
 
 ### `AnimatedConverter`
 
-A component that converts between an [`Animated.Value`][animated.value] and a [`SharedValue`][reanimated.sharedvalue] natively.
+A component that converts between an [`Animated.Node`][animated.node] and a [`SharedValue`][reanimated.sharedvalue] natively.
 
 It accepts the following props:
 
 - `from`: Value to read and observe changes from.
 
-  `Animated.Node` - `Animated.Value` and result of modifications such as interpolation (`Animated.AnimatedInterpolation`), addition (`Animated.AnimatedAddition`), etc.
+  [`Animated.Node`][animated.node] - [`Animated.Value`][animated.value] or result of modifications such as interpolation (`Animated.AnimatedInterpolation`), addition (`Animated.AnimatedAddition`), etc.
 
-  `SharedValue<number>` or `DerivedValue<number>`
+  [`SharedValue<number>`][reanimated.sharedvalue] or [`DerivedValue<number>`][reanimated.derivedvalue]
 
 - `to`: Value to update when the `from` value changes.
 
-  `Animated.Value` or `SharedValue<number>`
+  [`Animated.Value`][animated.value] or [`SharedValue<number>`][reanimated.sharedvalue]
 
 Usage:
 
@@ -55,7 +55,7 @@ A component that observes changes in a given value and emits an event when the v
 
 It accepts the following props:
 
-- `value`: The value to observe. It can be a `number`, [`Animated.Value`][animated.value], or [`SharedValue`][reanimated.sharedvalue].
+- `value`: The value to observe. It can be a `number`, [`Animated.Node`][animated.node] for [Animated][animated], [`SharedValue`][reanimated.sharedvalue] or [`DerivedValue`][reanimated.derivedvalue] for [Reanimated][reanimated].
 - `onValueChange`: A callback function that is called when the observed value changes.
 
 Usage:
@@ -77,7 +77,7 @@ const animatedValue = useRef(new Animated.Value(0)).current;
 
 ## How it works
 
-The library renders a native component that receives an [`Animated.Value`][animated.value] or [`SharedValue`][reanimated.sharedvalue] value. When the value changes, the library dispatches an event with the updated value.
+The library renders a native component that receives an [`Animated.Node`][animated.node] or [`SharedValue`][reanimated.sharedvalue] value. When the value changes, the library dispatches an event with this value.
 
 This event is then used with [`Animated.event`][animated.event] (with native driver) or [`useEvent`][reanimated.useevent] to update [`Animated.Value`][animated.value] or [`SharedValue`][reanimated.sharedvalue] respectively, depending on the usage.
 
@@ -93,9 +93,13 @@ MIT
 
 Made with [create-react-native-library](https://github.com/callstack/react-native-builder-bob)
 
+[animated]: https://reactnative.dev/docs/animated
+[reanimated]: https://docs.swmansion.com/react-native-reanimated/docs/
+[animated.node]: https://reactnative.dev/docs/animated#node
 [animated.value]: https://reactnative.dev/docs/animated#value
 [animated.event]: https://reactnative.dev/docs/animated#event
 [reanimated.sharedvalue]: https://docs.swmansion.com/react-native-reanimated/docs/core/useSharedValue/
+[reanimated.derivedvalue]: https://docs.swmansion.com/react-native-reanimated/docs/core/useDerivedValue
 [reanimated.useevent]: https://docs.swmansion.com/react-native-reanimated/docs/advanced/useEvent
 [version-badge]: https://img.shields.io/npm/v/react-native-animated-observer.svg?style=flat-square
 [license-badge]: https://img.shields.io/npm/l/react-native-animated-observer.svg?style=flat-square

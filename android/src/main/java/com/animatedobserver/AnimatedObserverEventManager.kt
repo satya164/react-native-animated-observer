@@ -16,7 +16,7 @@ class AnimatedObserverEventManager(private val emitter: (value: Double) -> Unit)
         field = value
 
         value?.let {
-          register(value)
+          unregister = register(value)
           emit()
         }
       }
