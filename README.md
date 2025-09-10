@@ -3,7 +3,7 @@
 [![npm][version-badge]][version]
 [![MIT License][license-badge]][license]
 
-Helpers that let you observe the value of an [Animated][animated] or [Reanimated][reanimated] values and convert between them using native events.
+Helpers that let you observe [Animated][animated] and [Reanimated][reanimated] values and convert between them using native events.
 
 ## Use case
 
@@ -21,7 +21,7 @@ The library exports the following components:
 
 ### `AnimatedConverter`
 
-A component that converts between an [`Animated.Node`][animated.node] and a [`SharedValue`][reanimated.sharedvalue] natively.
+A component that converts between an [`Animated.Node`][animated.node] and a [`SharedValue<number>`][reanimated.sharedvalue] natively.
 
 It accepts the following props:
 
@@ -55,7 +55,7 @@ A component that observes changes in a given value and emits an event when the v
 
 It accepts the following props:
 
-- `value`: The value to observe. It can be a `number`, [`Animated.Node`][animated.node] for [Animated][animated], [`SharedValue`][reanimated.sharedvalue] or [`DerivedValue`][reanimated.derivedvalue] for [Reanimated][reanimated].
+- `value`: The value to observe. It can be a `number`, [`Animated.Node`][animated.node] for [Animated][animated], [`SharedValue<number>`][reanimated.sharedvalue] or [`DerivedValue<number>`][reanimated.derivedvalue] for [Reanimated][reanimated].
 - `onValueChange`: A callback function that is called when the observed value changes.
 
 Usage:
@@ -77,9 +77,9 @@ const animatedValue = useRef(new Animated.Value(0)).current;
 
 ## How it works
 
-The library renders a native component that receives an [`Animated.Node`][animated.node] or [`SharedValue`][reanimated.sharedvalue] value. When the value changes, the library dispatches an event with this value.
+The library renders a native component that receives an [`Animated.Node`][animated.node] or [`SharedValue<number>`][reanimated.sharedvalue] value. When the value changes, the library dispatches an event with this value.
 
-This event is then used with [`Animated.event`][animated.event] (with native driver) or [`useEvent`][reanimated.useevent] to update [`Animated.Value`][animated.value] or [`SharedValue`][reanimated.sharedvalue] respectively, depending on the usage.
+This event is then used with [`Animated.event`][animated.event] (with native driver) or [`useEvent`][reanimated.useevent] to update [`Animated.Value`][animated.value] or [`SharedValue<number>`][reanimated.sharedvalue] respectively, depending on the usage.
 
 ## Contributing
 
