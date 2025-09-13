@@ -1,5 +1,10 @@
 # Changelog
 
+## <small>0.2.4 (2025-09-13)</small>
+
+* chore: remove worklets peer dep for broader compat ([6f64e35](https://github.com/satya164/react-native-animated-observer/commit/6f64e35))
+* docs: tweak readme ([8240260](https://github.com/satya164/react-native-animated-observer/commit/8240260))
+
 ## <small>0.2.3 (2025-09-10)</small>
 
 * docs: fix typo ([21bb759](https://github.com/satya164/react-native-animated-observer/commit/21bb759))
